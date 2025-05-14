@@ -26,6 +26,10 @@ Regla de transición (binaria):
 | 001                         | 1         |
 | 000                         | 0         |
 
+Visualización Gráfica:
+
+<img src="src/assets/Rule30Amarillo.png" alt="Condiciones de Regla 30" style="width:80%;">
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
