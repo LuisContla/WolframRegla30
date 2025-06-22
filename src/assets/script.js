@@ -1,8 +1,8 @@
 window.onload = function () {
   const canvas = document.getElementById("rule30Canvas");
   const ctx = canvas.getContext("2d");
-  let rows = 80, cols = 40;
-  const cellSize = 4;
+  let rows = 50, cols = 100;
+  let cellSize = 10;
   canvas.width = cols * cellSize;
   canvas.height = rows * cellSize;
 
@@ -11,7 +11,7 @@ window.onload = function () {
   let grid = Array(rows).fill(null).map(() => Array(cols).fill(0));
   let running = false;
   let animationId;
-  let currentRow = 0;
+  let currentRow = 0; 8
   let centerColumnHistory = []; // Guarda la historia de la columna central
   let totalExecutionTime = 0;
   let generationTimes = [];
@@ -30,6 +30,15 @@ window.onload = function () {
         ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
       }
     }
+  }
+
+  function resizeCanvas(newCols, newRows, newCellSize) {
+    cols = newCols;
+    rows = newRows;
+    cellSize = newCellSize;
+    canvas.width = cols * cellSize;
+    canvas.height = rows * cellSize;
+    resetSimulation();
   }
 
   function isAtBorder(row) {
@@ -92,7 +101,31 @@ window.onload = function () {
     } else {
       running = false;
       toggleBtn.innerText = "Iniciar";
+      // Ejecutar los análisis automáticamente al terminar la simulación
+      analyzePeriodicity();
+      analyzeFrequency();
+      analyzeComplexity();
     }
+  }
+
+  function resetSimulation() {
+    cancelAnimationFrame(animationId);
+    running = false;
+    toggleBtn.innerText = "Iniciar";
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    grid = Array(rows).fill(null).map(() => Array(cols).fill(0));
+    grid[0][Math.floor(cols / 2)] = 1;
+    currentRow = 0;
+    generationCount = 0;
+    centerColumnHistory = [];
+    generationTimes = [];
+    totalExecutionTime = 0;
+    simulationStartTime = null;
+    document.getElementById("generationCounter").innerText = generationCount;
+    document.getElementById("generationTime").innerText = "0 ms";
+    document.getElementById("totalTime").innerText = "0 ms";
+    document.getElementById("averageTime").innerText = "0 ms";
+    drawGrid();
   }
 
   // 1. Analizar periodicidad (búsqueda de ciclos simples)
@@ -218,25 +251,13 @@ window.onload = function () {
   document.getElementById("periodicityBtn").onclick = analyzePeriodicity;
   document.getElementById("frequencyBtn").onclick = analyzeFrequency;
   document.getElementById("complexityBtn").onclick = analyzeComplexity;
+  document.getElementById("resetBtn").onclick = resetSimulation;
 
-  document.getElementById("resetBtn").onclick = () => {
-    cancelAnimationFrame(animationId);
-    running = false;
-    toggleBtn.innerText = "Iniciar";
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    grid = Array(rows).fill(null).map(() => Array(cols).fill(0));
-    grid[0][Math.floor(cols / 2)] = 1;
-    currentRow = 0;
-    generationCount = 0;
-    centerColumnHistory = [];
-    generationTimes = [];
-    totalExecutionTime = 0;
-    simulationStartTime = null;
-    document.getElementById("generationCounter").innerText = generationCount;
-    document.getElementById("generationTime").innerText = "0 ms";
-    document.getElementById("totalTime").innerText = "0 ms";
-    document.getElementById("averageTime").innerText = "0 ms";
-    drawGrid();
+  document.getElementById("resizeCanvasBtn").onclick = () => {
+    const newCols = parseInt(document.getElementById("colsInput").value);
+    const newRows = parseInt(document.getElementById("rowsInput").value);
+    const newCellSize = parseInt(document.getElementById("cellSizeInput").value);
+    resizeCanvas(newCols, newRows, newCellSize);
   };
 
   toggleBtn.onclick = () => {

@@ -4,6 +4,10 @@
 
 canvas {
   border: 2px solid black;
+  display: block;
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 button {
@@ -11,7 +15,8 @@ button {
   margin: 0rem 0.25rem 0rem 0.25rem;
 }
 
-select, input[type="number"] {
+select,
+input[type="number"] {
   height: 2.2rem;
   padding: 0 0.5rem;
   font-size: 1rem;
@@ -23,7 +28,9 @@ select, input[type="number"] {
   display: flex;
   align-items: center;
 }
-select:focus, input[type="number"]:focus {
+
+select:focus,
+input[type="number"]:focus {
   outline: 2px solid blue;
   border-color: #000000;
 }
@@ -35,7 +42,22 @@ select:focus, input[type="number"]:focus {
   text-align: center;
 }
 
-.botones-control, .analisis-control, select {
+.canvas-container {
+  width: 95vw;
+  overflow-x: auto;
+  margin: 0 auto;
+}
+
+.canvas-config{
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+.botones-control,
+.analisis-control,
+select {
   display: flex;
   justify-content: center;
   align-items: center;
