@@ -1,19 +1,12 @@
 # Regla 30 de Wolfram – Exploración Computacional
 
-Este proyecto es una implementación de la **Regla 30 de Wolfram**, un autómata celular unidimensional, desarrollado como parte de una práctica académica. El objetivo es estudiar el comportamiento emergente del sistema y aproximarse a las preguntas planteadas en [The Wolfram Rule 30 Prizes](https://www.rule30prize.org/).
-
-## Objetivos del Proyecto
-
-- Simular la evolución de la Regla 30 desde una semilla inicial.
-- Visualizar patrones generados y analizar su complejidad.
-- Explorar la posibilidad de extraer información o predecir partes de la evolución del sistema.
-- Contribuir, en la medida de lo posible, al análisis de las preguntas abiertas propuestas por Stephen Wolfram.
+Este proyecto es una implementación interactiva de la **Regla 30 de Wolfram**, un autómata celular unidimensional, desarrollada como parte de una práctica académica. El objetivo es estudiar el comportamiento emergente del sistema y aproximarse a las preguntas planteadas en [The Wolfram Rule 30 Prizes](https://www.rule30prize.org/).
 
 ## ¿Qué es la Regla 30?
 
 La Regla 30 es una de las 256 posibles reglas de autómatas celulares binarios unidimensionales. Fue descubierta por Stephen Wolfram y es notable por generar un comportamiento caótico a partir de reglas muy simples. Su forma más común de visualizarla es en forma de triángulo invertido donde cada fila representa una generación.
 
-Regla de transición (binaria):
+**Regla de transición (binaria):**
 
 | Vecindad (izq, centro, der) | Resultado |
 |-----------------------------|-----------|
@@ -26,19 +19,51 @@ Regla de transición (binaria):
 | 001                         | 1         |
 | 000                         | 0         |
 
-Visualización Gráfica:
+Visualización gráfica:
 
 <img src="src/assets/Rule30Amarillo.png" alt="Condiciones de Regla 30" style="width:80%;">
 
-# React + Vite
+## Funcionalidades principales
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- **Simulación visual interactiva:**  
+  Visualiza la evolución de la Regla 30 en un canvas, con una celda inicial activa en el centro.
 
-Currently, two official plugins are available:
+- **Configuración dinámica:**  
+  Permite modificar el número de columnas, filas y el tamaño de cada celda desde la interfaz.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Controles de simulación:**  
+  - Iniciar, pausar y reiniciar la simulación.
+  - Selección del comportamiento en los bordes (detener, continuar, invertir regla).
 
-## Expanding the ESLint configuration
+- **Zoom y navegación avanzada:**  
+  - Zoom con botones (+, -) y con Ctrl + rueda del mouse (centrado en el cursor).
+  - Botón para reiniciar el zoom.
+  - Scrollbars automáticos cuando el canvas excede el área visible.
+  - Navegación por arrastre con Shift + clic y mover el mouse.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Análisis automáticos y manuales:**  
+  - **Periodicidad:** Detecta si la columna central es periódica y muestra el periodo.
+  - **Frecuencia:** Calcula la proporción de ceros y unos en la columna central.
+  - **Complejidad:** Mide el tiempo de cómputo para calcular la celda central en distintas generaciones.
+  - Botón para ejecutar todos los análisis a la vez.
+
+- **Contadores y métricas:**  
+  - Número de generaciones.
+  - Tiempo de generación, total y promedio.
+
+## Uso
+
+1. Ajusta el tamaño del autómata (columnas, filas, tamaño de celda) y haz clic en **Aplicar**.
+2. Usa los botones para **iniciar**, **pausar** o **reiniciar** la simulación.
+3. Haz zoom con los botones o con **Ctrl + rueda del mouse**. Usa **Shift + clic y arrastra** para moverte por el canvas.
+4. Ejecuta los análisis desde los botones de la sección de análisis o automáticamente al finalizar la simulación.
+
+## Créditos
+
+Desarrollado como parte de una práctica académica en ESCOM-IPN.
+
+## Tecnologías utilizadas
+
+- React + Vite
+- JavaScript (canvas API)
+- HTML/CSS
