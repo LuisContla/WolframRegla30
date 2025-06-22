@@ -67,3 +67,7 @@ Desarrollado como parte de una práctica académica en ESCOM-IPN.
 - React + Vite
 - JavaScript (canvas API)
 - HTML/CSS
+
+---
+
+Para más información, puede consultar el [Reporte del Proyecto](Wolfram_Regla_30.pdf).
