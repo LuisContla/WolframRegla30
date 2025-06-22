@@ -44,8 +44,10 @@ input[type="number"]:focus {
 
 .canvas-container {
   width: 95vw;
-  overflow-x: auto;
+  max-height: 70vh;
+  overflow: auto;
   margin: 0 auto;
+  position: relative;
 }
 
 .canvas-config{
@@ -91,4 +93,16 @@ select {
   min-height: 80px;
   min-width: 120px;
   box-sizing: border-box;
+}
+
+.zoom-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem 0;
+  gap: 0.5rem;
+}
+
+.zoombtn{
+  font-weight: bold;
 }

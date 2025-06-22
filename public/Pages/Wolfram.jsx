@@ -13,6 +13,12 @@ function Wolfram() {
         <input id="cellSizeInput" type="number" min="1" max="15" defaultValue={1} step={1} />
         <button id="resizeCanvasBtn">Aplicar</button>
       </div>
+      <div className="zoom-control">
+        <label>Zoom:</label>
+        <button id="zoomInBtn" className="zoombtn">+</button>
+        <button id="zoomOutBtn" className="zoombtn">-</button>
+        <button id="resetZoomBtn">Reiniciar zoom</button>
+      </div>
       <div className="canvas-container">
         <canvas id="rule30Canvas"></canvas>
       </div>

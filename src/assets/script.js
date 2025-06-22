@@ -17,6 +17,19 @@ window.onload = function () {
   let generationTimes = [];
   let simulationStartTime = null;
 
+  let zoom = 1;
+  const minZoom = 0.5;
+  const maxZoom = 8;
+  const zoomStep = 0.25;
+
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let scrollStartX = 0;
+  let scrollStartY = 0;
+
+  const canvasContainer = document.querySelector(".canvas-container");
+
   const toggleBtn = document.getElementById("toggleBtn");
   const borderBehavior = document.getElementById("borderBehavior");
 
@@ -24,12 +37,19 @@ window.onload = function () {
   grid[0][Math.floor(cols / 2)] = 1;
 
   function drawGrid() {
+    // Ajusta el tamaño real del canvas según el zoom
+    canvas.width = cols * cellSize * zoom;
+    canvas.height = rows * cellSize * zoom;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(zoom, zoom);
     for (let y = 0; y <= currentRow; y++) {
       for (let x = 0; x < cols; x++) {
         ctx.fillStyle = grid[y][x] === 1 ? "black" : "white";
         ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
       }
     }
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform after drawing
   }
 
   function resizeCanvas(newCols, newRows, newCellSize) {
@@ -235,6 +255,14 @@ window.onload = function () {
     }
   }
 
+  function centerCanvasInContainer() {
+    const canvasContainer = document.querySelector(".canvas-container");
+    if (canvasContainer) {
+      canvasContainer.scrollLeft = (canvas.width * zoom - canvasContainer.clientWidth) / 2;
+      canvasContainer.scrollTop = (canvas.height * zoom - canvasContainer.clientHeight) / 2;
+    }
+  }
+
   toggleBtn.onclick = () => {
     if (!running) {
       running = true;
@@ -260,6 +288,84 @@ window.onload = function () {
     resizeCanvas(newCols, newRows, newCellSize);
   };
 
+  document.getElementById("zoomInBtn").onclick = () => {
+    if (zoom < maxZoom) {
+      zoom += zoomStep;
+      drawGrid();
+      // centerCanvasInContainer();
+    }
+  };
+  document.getElementById("zoomOutBtn").onclick = () => {
+    if (zoom > minZoom) {
+      zoom -= zoomStep;
+      drawGrid();
+      // centerCanvasInContainer();
+    }
+  };
+
+  document.getElementById("resetZoomBtn").onclick = () => {
+    zoom = 1;
+    drawGrid();
+    //centerCanvasInContainer();
+  };
+
+  canvas.addEventListener("wheel", function (e) {
+    if (!e.ctrlKey) return;
+    e.preventDefault();
+
+    const rect = canvas.getBoundingClientRect();
+    const canvasContainer = document.querySelector(".canvas-container");
+
+    // Posición del mouse relativa al canvas-container (incluyendo scroll actual)
+    const mouseX = e.clientX - rect.left + canvasContainer.scrollLeft;
+    const mouseY = e.clientY - rect.top + canvasContainer.scrollTop;
+
+    // Posición lógica en el canvas antes del zoom
+    const logicalX = mouseX / zoom;
+    const logicalY = mouseY / zoom;
+
+    // Calcula el nuevo zoom
+    let newZoom = zoom + (e.deltaY < 0 ? zoomStep : -zoomStep);
+    newZoom = Math.max(minZoom, Math.min(maxZoom, newZoom));
+    if (newZoom === zoom) return;
+
+    // Aplica el nuevo zoom y redibuja
+    zoom = newZoom;
+    drawGrid();
+
+    // Ajusta el scroll para mantener el punto bajo el mouse
+    canvasContainer.scrollLeft = (logicalX * zoom) - (e.clientX - rect.left);
+    canvasContainer.scrollTop = (logicalY * zoom) - (e.clientY - rect.top);
+  }, { passive: false });
+
+  canvasContainer.addEventListener("mousedown", function (e) {
+    if (e.shiftKey) {
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      scrollStartX = canvasContainer.scrollLeft;
+      scrollStartY = canvasContainer.scrollTop;
+      canvasContainer.style.cursor = "grab";
+      e.preventDefault();
+    }
+  });
+
+  window.addEventListener("mousemove", function (e) {
+    if (isDragging) {
+      const dx = e.clientX - dragStartX;
+      const dy = e.clientY - dragStartY;
+      canvasContainer.scrollLeft = scrollStartX - dx;
+      canvasContainer.scrollTop = scrollStartY - dy;
+    }
+  });
+
+  window.addEventListener("mouseup", function () {
+    if (isDragging) {
+      isDragging = false;
+      canvasContainer.style.cursor = "";
+    }
+  });
+
   toggleBtn.onclick = () => {
     if (!running) {
       running = true;
@@ -273,5 +379,5 @@ window.onload = function () {
     }
   };
 
-  drawGrid(); // Dibujo inicial
+  drawGrid();
 };
