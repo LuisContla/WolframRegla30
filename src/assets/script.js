@@ -1,41 +1,28 @@
 window.onload = function () {
+  /// [Configuración principal/Elementos y variables principales]
   const canvas = document.getElementById("rule30Canvas");
   const ctx = canvas.getContext("2d");
-  let rows = 50, cols = 100;
-  let cellSize = 10;
-  canvas.width = cols * cellSize;
-  canvas.height = rows * cellSize;
-
-  let generationCount = 0;
-
-  let grid = Array(rows).fill(null).map(() => Array(cols).fill(0));
-  let running = false;
-  let animationId;
-  let currentRow = 0; 8
-  let centerColumnHistory = []; // Guarda la historia de la columna central
-  let totalExecutionTime = 0;
-  let generationTimes = [];
-  let simulationStartTime = null;
-
-  let zoom = 1;
-  const minZoom = 0.5;
-  const maxZoom = 8;
-  const zoomStep = 0.25;
-
-  let isDragging = false;
-  let dragStartX = 0;
-  let dragStartY = 0;
-  let scrollStartX = 0;
-  let scrollStartY = 0;
-
   const canvasContainer = document.querySelector(".canvas-container");
-
   const toggleBtn = document.getElementById("toggleBtn");
   const borderBehavior = document.getElementById("borderBehavior");
 
-  // Estado inicial: solo una celda activa en el centro
+  /// [Configuración principal/Parámetros de la simulación]
+  let rows = 50, cols = 100, cellSize = 10;
+  let grid = Array(rows).fill(null).map(() => Array(cols).fill(0));
+  let running = false, animationId, currentRow = 0;
+  let centerColumnHistory = []; // Guarda la historia de la columna central
+  let totalExecutionTime = 0, generationTimes = [], simulationStartTime = null;
+  let generationCount = 0;
+
+  /// [Configuración principal/Parámetros de zoom y navegación]
+  let zoom = 1;
+  const minZoom = 0.5, maxZoom = 8, zoomStep = 0.25;
+  let isDragging = false, dragStartX = 0, dragStartY = 0, scrollStartX = 0, scrollStartY = 0;
+
+  // Inicializa el grid con una sola celda activa en el centro
   grid[0][Math.floor(cols / 2)] = 1;
 
+  /// [Dibujo de Canvas/Función para dibujar el autómata en el canvas]
   function drawGrid() {
     // Ajusta el tamaño real del canvas según el zoom
     canvas.width = cols * cellSize * zoom;
@@ -52,6 +39,7 @@ window.onload = function () {
     ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform after drawing
   }
 
+  /// [Dibujo de Canvas/Redimensiona el canvas y reinicia la simulación]
   function resizeCanvas(newCols, newRows, newCellSize) {
     cols = newCols;
     rows = newRows;
@@ -61,10 +49,12 @@ window.onload = function () {
     resetSimulation();
   }
 
+  /// [Dibujo de Canvas/Verifica si la fila actual toca los bordes]
   function isAtBorder(row) {
     return row[0] === 1 || row[cols - 1] === 1;
   }
 
+  /// [Regla 30/Aplica la Regla 30 (o invertida) para generar la siguiente fila]
   function applyRule30(prevRow, invert = false) {
     const newRow = Array(cols).fill(0);
     for (let i = 0; i < cols; i++) {
@@ -72,7 +62,6 @@ window.onload = function () {
       const center = prevRow[i];
       const right = prevRow[i + 1] || 0;
       const pattern = (left << 2) | (center << 1) | right;
-      // Regla 30 o invertida
       if (!invert) {
         newRow[i] = [0, 1, 1, 1, 1, 0, 0, 0][pattern];
       } else {
@@ -82,6 +71,7 @@ window.onload = function () {
     return newRow;
   }
 
+  /// [Regla 30/Avanza una generación en la simulación]
   function step() {
     if (currentRow < rows - 1) {
       let invert = false;
@@ -96,6 +86,7 @@ window.onload = function () {
         }
       }
 
+      // Medición de tiempo de generación
       const genStart = performance.now();
 
       grid[currentRow + 1] = applyRule30(grid[currentRow], invert);
@@ -105,6 +96,7 @@ window.onload = function () {
       drawGrid();
       generationCount++;
 
+      // Actualización de tiempos y contadores
       const genEnd = performance.now();
       const genTime = genEnd - genStart;
       generationTimes.push(genTime);
@@ -121,13 +113,11 @@ window.onload = function () {
     } else {
       running = false;
       toggleBtn.innerText = "Iniciar";
-      // Ejecutar los análisis automáticamente al terminar la simulación
-      analyzePeriodicity();
-      analyzeFrequency();
-      analyzeComplexity();
+      runAllAnalyses(); // Ejecuta los análisis al terminar
     }
   }
 
+  /// [Regla 30/Reinicia la simulación y limpia los contadores]
   function resetSimulation() {
     cancelAnimationFrame(animationId);
     running = false;
@@ -148,7 +138,7 @@ window.onload = function () {
     drawGrid();
   }
 
-  // 1. Analizar periodicidad (búsqueda de ciclos simples)
+  /// [Análisis Preguntas/Análisis de periodicidad]
 
   /*
     ¿Qué es un periodo en una secuencia?
@@ -180,17 +170,22 @@ window.onload = function () {
     probando todos los posibles periodos razonables.
   */
 
+  // Busca si la secuencia de la columna central se repite con algún periodo.
+  // Si encuentra un periodo, lo reporta; si no, indica que no hay periodicidad.
   function analyzePeriodicity() {
     const arr = centerColumnHistory;
     let result = "No se detectó periodicidad en la columna central.";
+    // Probar todos los posibles periodos desde 1 hasta la mitad de la longitud de la secuencia
     for (let period = 1; period <= arr.length / 2; period++) {
       let periodic = true;
+      // Compara cada elemento con el que está a 'period' posiciones adelante
       for (let i = 0; i < arr.length - period; i++) {
         if (arr[i] !== arr[i + period]) {
           periodic = false;
           break;
         }
       }
+      // Si se mantiene la periodicidad, reporta el periodo encontrado
       if (periodic) {
         result = `¡Secuencia periódica detectada con periodo ${period}!`;
         break;
@@ -199,16 +194,20 @@ window.onload = function () {
     document.getElementById("periodicityResult").innerText = result;
   }
 
-  // 2. Analizar frecuencia de ceros y unos
+  /// [Análisis Preguntas/Análisis de frecuencia de ceros y unos]
+  // Cuenta cuántos ceros y unos hay en la columna central y calcula su porcentaje.
   function analyzeFrequency() {
     const arr = centerColumnHistory;
     const zeros = arr.filter(x => x === 0).length;
     const ones = arr.filter(x => x === 1).length;
+    // Calcula el porcentaje de ceros y unos respecto al total
     const result = `Frecuencia:\nCeros: ${zeros} (${((zeros / arr.length) * 100).toFixed(2)}%)\nUnos: ${ones} (${((ones / arr.length) * 100).toFixed(2)}%)`;
     document.getElementById("frequencyResult").innerText = result;
   }
 
-  // 3. Analizar complejidad (tiempo de cómputo para n)
+  /// [Análisis Preguntas/Análisis de complejidad (tiempo de cómputo para n)]
+  // Mide el tiempo que tarda en calcular la celda central para varias generaciones grandes.
+  // También calcula el factor de crecimiento del tiempo conforme aumenta la generación.
   function analyzeComplexity() {
     const input = document.getElementById("complexityInput");
     let n = parseInt(input.value);
@@ -216,15 +215,18 @@ window.onload = function () {
       document.getElementById("complexityResult").innerText = "Por favor ingresa un número de generación válido.";
       return;
     }
+    // Prueba con n, n+1000, n+10000, n+100000 generaciones
     const increments = [0, 1000, 10000, 100000];
     let times = [];
     let results = "";
 
     increments.forEach(inc => {
       const gen = n + inc;
+      // Inicializa una fila con una sola celda activa en el centro
       let prevGrid = Array(gen).fill(0);
       prevGrid[Math.floor(prevGrid.length / 2)] = 1;
       let row = prevGrid;
+      // Mide el tiempo de cómputo para llegar a la generación 'gen'
       const t0 = performance.now();
       for (let i = 1; i < gen; i++) {
         row = applyRule30(row);
@@ -235,7 +237,7 @@ window.onload = function () {
       results += `Generación ${gen}: ${elapsed.toFixed(2)} ms\n`;
     });
 
-    // Calcular factores de crecimiento
+    // Calcula el factor de crecimiento del tiempo entre cada incremento
     let growth = "";
     for (let i = 1; i < times.length; i++) {
       const factor = times[i] / times[i - 1];
@@ -246,7 +248,14 @@ window.onload = function () {
       `Tiempos para calcular la celda central:\n${results}\nFactores de crecimiento:\n${growth}`;
   }
 
-  // Función para formatear el tiempo: muestra en ms si < 1000, en segundos si >= 1000
+  /// [Análisis Preguntas/Ejecuta todos los análisis]
+  function runAllAnalyses() {
+    analyzePeriodicity();
+    analyzeFrequency();
+    analyzeComplexity();
+  }
+
+  // --- Formatea el tiempo para mostrar en ms o segundos ---
   function formatTime(timeMs) {
     if (timeMs < 1000) {
       return `${timeMs.toFixed(2)} ms`;
@@ -255,13 +264,7 @@ window.onload = function () {
     }
   }
 
-  function centerCanvasInContainer() {
-    const canvasContainer = document.querySelector(".canvas-container");
-    if (canvasContainer) {
-      canvasContainer.scrollLeft = (canvas.width * zoom - canvasContainer.clientWidth) / 2;
-      canvasContainer.scrollTop = (canvas.height * zoom - canvasContainer.clientHeight) / 2;
-    }
-  }
+  /// [Eventos de control de la simulación]
 
   toggleBtn.onclick = () => {
     if (!running) {
@@ -280,6 +283,7 @@ window.onload = function () {
   document.getElementById("frequencyBtn").onclick = analyzeFrequency;
   document.getElementById("complexityBtn").onclick = analyzeComplexity;
   document.getElementById("resetBtn").onclick = resetSimulation;
+  document.getElementById("runAllAnalysesBtn").onclick = runAllAnalyses;
 
   document.getElementById("resizeCanvasBtn").onclick = () => {
     const newCols = parseInt(document.getElementById("colsInput").value);
@@ -288,33 +292,12 @@ window.onload = function () {
     resizeCanvas(newCols, newRows, newCellSize);
   };
 
-  document.getElementById("zoomInBtn").onclick = () => {
-    if (zoom < maxZoom) {
-      zoom += zoomStep;
-      drawGrid();
-      // centerCanvasInContainer();
-    }
-  };
-  document.getElementById("zoomOutBtn").onclick = () => {
-    if (zoom > minZoom) {
-      zoom -= zoomStep;
-      drawGrid();
-      // centerCanvasInContainer();
-    }
-  };
-
-  document.getElementById("resetZoomBtn").onclick = () => {
-    zoom = 1;
-    drawGrid();
-    //centerCanvasInContainer();
-  };
-
+  /// [Zoom/Navegación y zoom con scroll]
   canvas.addEventListener("wheel", function (e) {
     if (!e.ctrlKey) return;
     e.preventDefault();
 
     const rect = canvas.getBoundingClientRect();
-    const canvasContainer = document.querySelector(".canvas-container");
 
     // Posición del mouse relativa al canvas-container (incluyendo scroll actual)
     const mouseX = e.clientX - rect.left + canvasContainer.scrollLeft;
@@ -338,6 +321,7 @@ window.onload = function () {
     canvasContainer.scrollTop = (logicalY * zoom) - (e.clientY - rect.top);
   }, { passive: false });
 
+  // --- Navegación por arrastre con Shift + clic ---
   canvasContainer.addEventListener("mousedown", function (e) {
     if (e.shiftKey) {
       isDragging = true;
@@ -350,6 +334,25 @@ window.onload = function () {
     }
   });
 
+  /// [Zoom/Controles de zoom]
+  document.getElementById("zoomInBtn").onclick = () => {
+    if (zoom < maxZoom) {
+      zoom += zoomStep;
+      drawGrid();
+    }
+  };
+  document.getElementById("zoomOutBtn").onclick = () => {
+    if (zoom > minZoom) {
+      zoom -= zoomStep;
+      drawGrid();
+    }
+  };
+  document.getElementById("resetZoomBtn").onclick = () => {
+    zoom = 1;
+    drawGrid();
+  };
+
+  /// [Dibujo interactivo/Navegación por arrastre]
   window.addEventListener("mousemove", function (e) {
     if (isDragging) {
       const dx = e.clientX - dragStartX;
@@ -366,18 +369,6 @@ window.onload = function () {
     }
   });
 
-  toggleBtn.onclick = () => {
-    if (!running) {
-      running = true;
-      toggleBtn.innerText = "Pausar";
-      if (!simulationStartTime) simulationStartTime = performance.now();
-      animationId = requestAnimationFrame(step);
-    } else {
-      running = false;
-      toggleBtn.innerText = "Iniciar";
-      cancelAnimationFrame(animationId);
-    }
-  };
-
+  // --- Dibuja el estado inicial ---
   drawGrid();
 };

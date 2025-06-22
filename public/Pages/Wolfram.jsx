@@ -4,6 +4,26 @@ function Wolfram() {
   return (
     <div className="contenedor-principal">
       <h1>Simulación Regla 30</h1>
+      <div className="zoom-control">
+        <label>Zoom:</label>
+        <button id="zoomInBtn" className="zoombtn">+</button>
+        <button id="zoomOutBtn" className="zoombtn">-</button>
+        <button id="resetZoomBtn">Reiniciar zoom</button>
+        <div className="zoom-help" style={{ background: "#f5f5f5", padding: "0.7rem", borderRadius: "8px", maxWidth: "600px" }}>
+          <strong>Controles de Zoom:</strong>
+          <ul style={{ textAlign: "left", margin: "0.5rem 0 0 1.5rem" }}>
+            <li>
+              <b>Ctrl + Rueda del mouse</b>: Zoom enfocado en el punto del cursor.
+            </li>
+            <li>
+              <b>Shift + clic y arrastrar</b>: Mover la vista del canvas.
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div className="canvas-container">
+        <canvas id="rule30Canvas"></canvas>
+      </div>
       <div className="canvas-config">
         <label>Columnas:</label>
         <input id="colsInput" type="number" min="10" max="2000" defaultValue={1000} step={50} />
@@ -12,15 +32,6 @@ function Wolfram() {
         <label>Celda (px):</label>
         <input id="cellSizeInput" type="number" min="1" max="15" defaultValue={1} step={1} />
         <button id="resizeCanvasBtn">Aplicar</button>
-      </div>
-      <div className="zoom-control">
-        <label>Zoom:</label>
-        <button id="zoomInBtn" className="zoombtn">+</button>
-        <button id="zoomOutBtn" className="zoombtn">-</button>
-        <button id="resetZoomBtn">Reiniciar zoom</button>
-      </div>
-      <div className="canvas-container">
-        <canvas id="rule30Canvas"></canvas>
       </div>
       <div className="botones-control">
         <button id="toggleBtn">Iniciar</button>
@@ -32,6 +43,7 @@ function Wolfram() {
         </select>
       </div>
       <div className="analisis-control">
+        <button id="runAllAnalysesBtn">Realizar todos los análisis</button>
         <button id="periodicityBtn">Analizar periodicidad</button>
         <button id="frequencyBtn">Analizar frecuencia</button>
         <button id="complexityBtn">Analizar complejidad</button>

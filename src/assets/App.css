@@ -48,12 +48,12 @@ input[type="number"]:focus {
   overflow: auto;
   margin: 0 auto;
   position: relative;
+  margin: 1rem 0rem 1rem 0rem;
 }
 
 .canvas-config{
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
   gap: 0.5rem;
 }
 
